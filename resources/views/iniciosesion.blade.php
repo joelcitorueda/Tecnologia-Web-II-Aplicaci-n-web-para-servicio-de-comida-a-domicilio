@@ -3,88 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú Principal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>SempaiDelivery</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <style>
-        :root {
-            --primary-color: #25D162;
-            --dark-gray: #2B2B2B;
-            --darker-gray: #1D1D1D;
-            --white: #FFFFFF;
+        body {
+            background-color: #f8f9fa;
         }
-
+        .btn-primary, .price, .total, .navbar-brand, .nav-link, .footer-logo, .order-summary h4 {
+            color: #9FB3DF !important;
+        }
+        .btn-primary {
+            background-color: #9FB3DF;
+            border-color: #9FB3DF;
+        }
+        .btn-primary:hover {
+            background-color: #7D97C6;
+            border-color: #7D97C6;
+        }
         .card {
-            max-width: 280px;
-            height: 360px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            border-radius: 12px;
+            transition: transform 0.2s;
         }
-
-        .card img {
-            height: 150px;
-            object-fit: cover;
+        .card:hover {
+            transform: scale(1.02);
+        }
+        .order-summary {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .search-bar {
+            max-width: 400px;
+            margin: 0 auto;
+            display: flex;
+        }
+        .search-bar input {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .search-bar button {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 2rem;
+        }
+        .footer-logo {
+            width: 40px;
         }
     </style>
 </head>
-<body class="bg-[var(--darker-gray)] text-[var(--white)]">
-
-    <div class="container mx-auto p-4">
-        <h1 class="text-3xl font-bold text-center text-[var(--primary-color)] mb-6">Menú de Comida</h1>
-
-        <div class="flex justify-center gap-4 mb-6">
-            <button class="bg-[var(--primary-color)] text-[var(--white)] px-4 py-2 rounded-lg">Pizza</button>
-            <button class="bg-[var(--primary-color)] text-[var(--white)] px-4 py-2 rounded-lg">Hamburguesas</button>
-            <button class="bg-[var(--primary-color)] text-[var(--white)] px-4 py-2 rounded-lg">Bebidas</button>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#">SempaiDelivery</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#">Tienda</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('carrito.index') }}">Carrito</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Contáctanos</a></li>
+                </ul>
+            </div>
         </div>
+    </nav>
 
-        <div class="flex flex-wrap justify-center gap-6">
-            <div class="card bg-[var(--dark-gray)] p-4 rounded-lg shadow-lg">
-                <img src="https://thepizzasecret.com/wp-content/uploads/2023/05/20220211142754-margherita-9920.jpg" alt="Pizza" class="w-full rounded-lg">
-                <div>
-                    <h2 class="text-lg font-bold">Pizza Margarita</h2>
-                    <p class="text-sm text-gray-300">Pizza con salsa de tomate, queso y albahaca.</p>
-                    <p class="text-lg font-semibold">20.99 Bs</p>
+    <div class="container mt-4">
+        <div class="search-bar mb-4">
+            <input type="text" name="busqueda" class="form-control" placeholder="Buscar productos...">
+            <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <h2 class="text-center mb-4">Nuestra Tienda</h2>
+                <div class="row">
+                    @foreach($productos as $producto)
+                        <div class="col-12 mb-4">
+                            <div class="card shadow-sm d-flex flex-row align-items-center p-3">
+                                <img src="{{ $producto->imagen ?? 'https://via.placeholder.com/120' }}" class="img-thumbnail me-3" style="width: 120px; height: 120px; object-fit: cover; border-radius: 10px;" alt="{{ $producto->nombre }}">
+
+                                <div class="card-body flex-grow-1">
+                                    <h5 class="card-title mb-1">{{ $producto->nombre }}</h5>
+                                    <p class="mb-1">{{ Str::limit($producto->descripcion, 80) }}</p>
+                                </div>
+
+                                <div class="text-end">
+                                    <p class="price">Bs {{ number_format($producto->precio, 2) }}</p>
+                                    <form action="{{ route('carrito.agregar', $producto->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary">Añadir al carrito</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
-                <form action="{{ route('carrito.agregar') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="nombre" value="Pizza Margarita">
-                    <input type="hidden" name="precio" value="20.99">
-                    <button type="submit" class="bg-[var(--primary-color)] text-[var(--white)] w-full py-2 rounded-lg mt-2">Agregar al carrito</button>
-                </form>
             </div>
 
-            <div class="card bg-[var(--dark-gray)] p-4 rounded-lg shadow-lg">
-                <img src="https://media.istockphoto.com/id/1473452859/es/foto/sabrosa-hamburguesa-con-queso-vaso-de-cola-y-papas-fritas-en-primer-plano-de-bandeja-de-madera.jpg?s=612x612&w=0&k=20&c=cz14RIorGJFn3mFhBFL66PqvXD1nYC_28Cc_OO4mhps=" alt="Hamburguesa" class="w-full rounded-lg">
-                <div>
-                    <h2 class="text-lg font-bold">Hamburguesa Clásica</h2>
-                    <p class="text-sm text-gray-300">Jugosa carne, lechuga, tomate y queso cheddar.</p>
-                    <p class="text-lg font-semibold">18.99 Bs</p>
+            <div class="col-md-4">
+                <div class="order-summary">
+                    <h4>Resumen del Pedido</h4>
+                    <p>Subtotal: <span id="subtotal">Bs 0.00</span></p>
+                    <p>Envío: <span id="envio">Bs 0.00</span></p>
+                    <p>Impuestos: <span id="impuestos">Bs 0.00</span></p>
+                    <p class="total">Total: <span id="total">Bs 0.00</span></p>
+                    <button class="btn btn-primary w-100">Proceder al Pago</button>
                 </div>
-                <form action="{{ route('carrito.agregar') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="nombre" value="Hamburguesa Clásica">
-                    <input type="hidden" name="precio" value="18.99">
-                    <button type="submit" class="bg-[var(--primary-color)] text-[var(--white)] w-full py-2 rounded-lg mt-2">Agregar al carrito</button>
-                </form>
-            </div>
-
-            <div class="card bg-[var(--dark-gray)] p-4 rounded-lg shadow-lg">
-                <img src="https://th.bing.com/th/id/R.5015c1ffac04c2b61e8ee80425ce5e59?rik=3ldpGwwjcH14ag&riu=http%3a%2f%2fwww.reporte90.net%2fwp-content%2fuploads%2f2018%2f08%2f39610005_1877297039021490_8195927065497698304_n.jpg&ehk=EBub92GmJo0EBj%2fMHq%2b7WR5tOLOze3Kj3oMoiYZ1grY%3d&risl=&pid=ImgRaw&r=0" alt="Bebida" class="w-full rounded-lg">
-                <div>
-                    <h2 class="text-lg font-bold">Coca Cola</h2>
-                    <p class="text-sm text-gray-300">Refrescante bebida carbonatada.</p>
-                    <p class="text-lg font-semibold">12.99 Bs</p>
-                </div>
-                <form action="{{ route('carrito.agregar') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="nombre" value="Coca Cola">
-                    <input type="hidden" name="precio" value="12.99">
-                    <button type="submit" class="bg-[var(--primary-color)] text-[var(--white)] w-full py-2 rounded-lg mt-2">Agregar al carrito</button>
-                </form>
             </div>
         </div>
     </div>
 
+    <footer class="bg-dark text-white text-center py-5 mt-5">
+        <p class="mb-2">Proyecto de Tecnología Web II - Sistema <strong>SempaiDelivery</strong></p>
+        <p class="mb-2">Aceptamos pagos con:</p>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" alt="Mastercard" class="footer-logo">
+        <p class="mt-3 mb-0">&copy; 2025 SempaiDelivery. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        let subtotal = 0;
+        function agregarAlCarrito(id, nombre, precio) {
+            subtotal += precio;
+            document.getElementById("subtotal").innerText = `Bs ${subtotal.toFixed(2)}`;
+            document.getElementById("total").innerText = `Bs ${subtotal.toFixed(2)}`;
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

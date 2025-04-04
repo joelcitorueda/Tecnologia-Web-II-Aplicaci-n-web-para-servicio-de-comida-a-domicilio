@@ -19,18 +19,20 @@ class AuthController extends Controller
         return view('auth.registro');
     }
 
-    public function login(Request $request) {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+    public function login(Request $request)
+{
+    // Validar los datos del usuario
+    $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
-            return redirect()->route('iniciosesion');
-        }
-
-        return back()->withErrors(['email' => 'Credenciales incorrectas']);
+    if (Auth::attempt($credentials)) {
+        // Si las credenciales son correctas, redirigir a la ruta deseada
+        return redirect()->route('iniciosesion');
     }
+
+    // Si las credenciales son incorrectas, volver al formulario de login con un mensaje de error
+    return redirect()->route('login')->withErrors(['email' => 'Las credenciales no coinciden con nuestros registros.']);
+}
+
 
     public function register(Request $request) {
         $request->validate([
@@ -47,7 +49,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('orders/create');
+        return redirect()->route('login');
     }
 
     public function logout() {

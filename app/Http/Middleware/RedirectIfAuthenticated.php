@@ -17,6 +17,11 @@ class RedirectIfAuthenticated
      */
     public function handle(Request $request, Closure $next, string ...$guards): Response
     {
+
+        if (Auth::check()) {
+            // Redirigir a la página deseada si el usuario está autenticado
+            return redirect()->route('iniciosesion');
+        }
         $guards = empty($guards) ? [null] : $guards;
 
         foreach ($guards as $guard) {
